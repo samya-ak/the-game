@@ -31,6 +31,7 @@ func Init() (*gorm.DB, error) {
 	}
 
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.GameState{})
 
 	fmt.Println("Connected to DB ...")
 	return db, nil

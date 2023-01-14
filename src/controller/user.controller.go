@@ -28,6 +28,18 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 	return user, nil
 }
 
+// UpdateGameState is the resolver for the updateGameState field.
+func (r *mutationResolver) UpdateGameState(ctx context.Context, input *model.UserGameState) (*model.GameState, error) {
+	log.Println("Updating user's game state")
+	user := &model.User{ID: input.UserID}
+	rslt, err := user.UpdateGameState(ctx, input)
+	if err != nil {
+		log.Printf("error while updating user's game state: %v", err)
+		return nil, err
+	}
+	return rslt, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var users model.User

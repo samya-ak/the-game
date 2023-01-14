@@ -2,11 +2,25 @@
 
 package model
 
+type GameState struct {
+	ID          string `json:"id"`
+	GamesPlayed *int   `json:"gamesPlayed"`
+	Score       *int   `json:"score"`
+	UserID      string `json:"userId"`
+}
+
 type NewUser struct {
 	Name string `json:"name"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID        string     `json:"id"`
+	Name      string     `json:"name"`
+	GameState *GameState `json:"gameState"`
+}
+
+type UserGameState struct {
+	UserID      string `json:"userId"`
+	GamesPlayed *int   `json:"gamesPlayed"`
+	Score       *int   `json:"score"`
 }
