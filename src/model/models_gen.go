@@ -2,21 +2,22 @@
 
 package model
 
+type Friend struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Highscore int    `json:"highscore"`
+}
+
 type GameState struct {
 	ID          string `json:"id"`
 	GamesPlayed *int   `json:"gamesPlayed"`
 	Score       *int   `json:"score"`
 	UserID      string `json:"userId"`
+	User        *User  `json:"user"`
 }
 
 type NewUser struct {
 	Name string `json:"name"`
-}
-
-type User struct {
-	ID        string     `json:"id"`
-	Name      string     `json:"name"`
-	GameState *GameState `json:"gameState"`
 }
 
 type UserGameState struct {

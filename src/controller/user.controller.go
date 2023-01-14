@@ -29,10 +29,10 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 // UpdateGameState is the resolver for the updateGameState field.
-func (r *mutationResolver) UpdateGameState(ctx context.Context, input *model.UserGameState) (*model.GameState, error) {
+func (r *mutationResolver) UpdateGameState(ctx context.Context, input model.UserGameState) (*model.GameState, error) {
 	log.Println("Updating user's game state")
 	user := &model.User{ID: input.UserID}
-	rslt, err := user.UpdateGameState(ctx, input)
+	rslt, err := user.UpdateGameState(ctx, &input)
 	if err != nil {
 		log.Printf("error while updating user's game state: %v", err)
 		return nil, err
@@ -40,10 +40,47 @@ func (r *mutationResolver) UpdateGameState(ctx context.Context, input *model.Use
 	return rslt, nil
 }
 
+// AddFriends is the resolver for the addFriends field.
+func (r *mutationResolver) AddFriends(ctx context.Context, userID string, input []string) ([]*model.Friend, error) {
+	log.Println("Adding friends")
+	user := &model.User{ID: userID}
+	rslt, err := user.AddFriends(ctx, input)
+	if err != nil {
+		log.Printf("error while adding friends: %v", err)
+		return nil, err
+	}
+	return rslt, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	log.Println("Getting all users")
 	var users model.User
 	return users.GetAll(ctx)
+}
+
+// GetGameState is the resolver for the getGameState field.
+func (r *queryResolver) GetGameState(ctx context.Context, userID string) (*model.GameState, error) {
+	log.Println("Getting user's game state")
+	user := &model.User{ID: userID}
+	rslt, err := user.GetGameState(ctx, user)
+	if err != nil {
+		log.Printf("error while geeting user's game state: %v", err)
+		return nil, err
+	}
+	return rslt, nil
+}
+
+// GetFriends is the resolver for the getFriends field.
+func (r *queryResolver) GetFriends(ctx context.Context, userID string) ([]*model.Friend, error) {
+	log.Println("Getting friends")
+	user := &model.User{ID: userID}
+	rslt, err := user.GetFriends(ctx)
+	if err != nil {
+		log.Printf("error while getting friends: %v", err)
+		return nil, err
+	}
+	return rslt, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.

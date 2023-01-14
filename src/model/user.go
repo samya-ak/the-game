@@ -2,10 +2,34 @@ package model
 
 import (
 	"context"
+	"encoding/json"
 	mw "thegame/middleware"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
+
+type User struct {
+	ID         string     `json:"id"`
+	Name       string     `json:"name"`
+	GameState  *GameState `json:"gameState"`
+	Friends    string     `json:"friends" gorm:"type:text"`
+	FriendsArr []string   `gorm:"-"`
+}
+
+func (u *User) BeforeSave(tx *gorm.DB) error {
+	friends, err := json.Marshal(u.FriendsArr)
+	if err != nil {
+		return err
+	}
+	u.Friends = string(friends)
+	return nil
+}
+
+func (u *User) AfterFind(tx *gorm.DB) error {
+	err := json.Unmarshal([]byte(u.Friends), &u.FriendsArr)
+	return err
+}
 
 func GetIntPointer(value int) *int {
 	return &value
@@ -61,4 +85,54 @@ func (u User) UpdateGameState(ctx context.Context, input *UserGameState) (*GameS
 		return nil, err
 	}
 	return state, nil
+}
+
+func (u *User) GetGameState(ctx context.Context, user *User) (*GameState, error) {
+	state := &GameState{UserID: user.ID}
+	db := mw.GetDbFromContext(ctx)
+	if err := db.First(state).Error; err != nil {
+		return nil, err
+	}
+	return state, nil
+}
+
+func (u *User) AddFriends(ctx context.Context, friends []string) ([]*Friend, error) {
+	db := mw.GetDbFromContext(ctx)
+	u.FriendsArr = friends
+
+	if err := db.Save(u).Error; err != nil {
+		return nil, err
+	}
+	fs, err := u.GetFriends(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return fs, nil
+}
+
+func (u *User) GetFriends(ctx context.Context) ([]*Friend, error) {
+	db := mw.GetDbFromContext(ctx)
+	user := &User{ID: u.ID}
+	if err := db.First(user).Error; err != nil {
+		return nil, err
+	}
+	var users []*User
+	if err := db.Where("id in (?)", user.Friends).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return usersToFriends(users), nil
+}
+
+func usersToFriends(users []*User) []*Friend {
+	friends := make([]*Friend, 0)
+
+	for _, user := range users {
+		friend := &Friend{
+			ID:        user.ID,
+			Name:      user.Name,
+			Highscore: *user.GameState.Score,
+		}
+		friends = append(friends, friend)
+	}
+	return friends
 }

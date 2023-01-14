@@ -5,10 +5,13 @@ type User {
  id: ID!
  name: String!
  gameState: GameState
+ friends: [ID!]
 }
 
 type Query {
  users: [User!]!
+ getGameState(userId: ID!): GameState!
+ getFriends(userId: ID!): [Friend]!
 }
 
 type GameState {
@@ -17,6 +20,12 @@ type GameState {
 	score: Int
 	userId: ID!
 	user: User
+}
+
+type Friend {
+	id: ID!
+	name: String!
+	highscore: Int!
 }
 
 input NewUser {
@@ -33,4 +42,5 @@ input UserGameState {
 type Mutation {
  createUser(input: NewUser!): User!
  updateGameState(input: UserGameState!): GameState!
+ addFriends(userID: ID!, input: [ID!]): [Friend]!
 }
