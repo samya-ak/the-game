@@ -10,6 +10,7 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=thegame
       - DB_PORT=5432
+      - HOST=database
     depends_on:
       - database
 
