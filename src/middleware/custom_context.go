@@ -12,7 +12,7 @@ type DbKeyType string
 
 var DbKey DbKeyType = "DB"
 
-func CreateDbContext(database *gorm.DB, h *handler.Server) gin.HandlerFunc {
+var CreateDbContext = func(database *gorm.DB, h *handler.Server) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := context.WithValue(c.Request.Context(), DbKey, database)
 		c.Request = c.Request.WithContext(ctx)
@@ -20,6 +20,6 @@ func CreateDbContext(database *gorm.DB, h *handler.Server) gin.HandlerFunc {
 	}
 }
 
-func GetDbFromContext(ctx context.Context) *gorm.DB {
+var GetDbFromContext = func(ctx context.Context) *gorm.DB {
 	return ctx.Value(DbKey).(*gorm.DB)
 }

@@ -9,52 +9,42 @@ import (
 	"log"
 	"thegame/graph"
 	"thegame/model"
-
-	"github.com/google/uuid"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	log.Println("Creating a new USER")
-	uuidValue := uuid.NewString()
-	user := &model.User{ID: uuidValue, Name: input.Name}
-
-	return user.Create(ctx, user)
+	return r.UserService.Create(ctx, input)
 }
 
 // UpdateGameState is the resolver for the updateGameState field.
 func (r *mutationResolver) UpdateGameState(ctx context.Context, input model.UserGameState) (*model.GameState, error) {
 	log.Println("Updating user's game state")
-	user := &model.User{ID: input.UserID}
-	return user.UpdateGameState(ctx, &input)
+	return r.UserService.UpdateGameState(ctx, &input)
 }
 
 // AddFriends is the resolver for the addFriends field.
 func (r *mutationResolver) AddFriends(ctx context.Context, userID string, input []string) ([]*model.Friend, error) {
 	log.Println("Adding friends")
-	user := &model.User{ID: userID}
-	return user.AddFriends(ctx, input, user)
+	return r.UserService.AddFriends(ctx, userID, input)
 }
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	log.Println("Getting all users")
-	var users model.User
-	return users.GetAll(ctx)
+	return r.UserService.GetAll(ctx)
 }
 
 // GetGameState is the resolver for the getGameState field.
 func (r *queryResolver) GetGameState(ctx context.Context, userID string) (*model.GameState, error) {
 	log.Println("Getting user's game state")
-	user := &model.User{ID: userID}
-	return user.GetGameState(ctx, user)
+	return r.UserService.GetGameState(ctx, userID)
 }
 
 // GetFriends is the resolver for the getFriends field.
 func (r *queryResolver) GetFriends(ctx context.Context, userID string) ([]*model.Friend, error) {
 	log.Println("Getting friends")
-	user := &model.User{ID: userID}
-	return user.GetFriends(ctx, user)
+	return r.UserService.GetFriends(ctx, userID)
 }
 
 // Mutation returns graph.MutationResolver implementation.

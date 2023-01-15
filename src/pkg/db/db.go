@@ -18,8 +18,6 @@ var (
 )
 
 func Init() (*gorm.DB, error) {
-	fmt.Println("user>>>", DB_USER)
-	fmt.Println("pass>>", DB_PASSWORD)
 	dbURL := fmt.Sprintf("postgres://%s:%s@database:%s/%s", DB_USER, DB_PASSWORD, DB_PORT, DB)
 
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{

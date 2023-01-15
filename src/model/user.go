@@ -17,6 +17,15 @@ type User struct {
 	FriendsArr []string   `gorm:"-"`
 }
 
+type UserService interface {
+	Create(ctx context.Context, input NewUser) (*User, error)
+	UpdateGameState(ctx context.Context, input *UserGameState) (*GameState, error)
+	AddFriends(ctx context.Context, userID string, friends []string) ([]*Friend, error)
+	GetAll(ctx context.Context) ([]*User, error)
+	GetGameState(ctx context.Context, userID string) (*GameState, error)
+	GetFriends(ctx context.Context, userID string) ([]*Friend, error)
+}
+
 func (u *User) BeforeSave(tx *gorm.DB) error {
 	friends, err := json.Marshal(u.FriendsArr)
 	if err != nil {
@@ -35,8 +44,10 @@ func GetIntPointer(value int) *int {
 	return &value
 }
 
-func (u *User) Create(ctx context.Context, user *User) (*User, error) {
+func (u *User) Create(ctx context.Context, input NewUser) (*User, error) {
 	db := mw.GetDbFromContext(ctx)
+	uuidValue := uuid.NewString()
+	user := &User{ID: uuidValue, Name: input.Name}
 
 	tx := db.Begin()
 	if err := tx.Create(&user).Error; err != nil {
@@ -92,17 +103,18 @@ func (u User) UpdateGameState(ctx context.Context, input *UserGameState) (*GameS
 	return state, nil
 }
 
-func (u *User) GetGameState(ctx context.Context, user *User) (*GameState, error) {
+func (u *User) GetGameState(ctx context.Context, userID string) (*GameState, error) {
 	state := &GameState{}
 	db := mw.GetDbFromContext(ctx)
-	if err := db.Where("user_id = ?", user.ID).First(state).Error; err != nil {
+	if err := db.Where("user_id = ?", userID).First(state).Error; err != nil {
 		return nil, err
 	}
 	return state, nil
 }
 
-func (u *User) AddFriends(ctx context.Context, friends []string, user *User) ([]*Friend, error) {
+func (u *User) AddFriends(ctx context.Context, userID string, friends []string) ([]*Friend, error) {
 	db := mw.GetDbFromContext(ctx)
+	user := &User{ID: userID}
 
 	if err := db.First(user).Error; err != nil {
 		return nil, err
@@ -112,15 +124,16 @@ func (u *User) AddFriends(ctx context.Context, friends []string, user *User) ([]
 	if err := db.Save(user).Error; err != nil {
 		return nil, err
 	}
-	fs, err := u.GetFriends(ctx, user)
+	fs, err := u.GetFriends(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	return fs, nil
 }
 
-func (u *User) GetFriends(ctx context.Context, user *User) ([]*Friend, error) {
+func (u *User) GetFriends(ctx context.Context, userID string) ([]*Friend, error) {
 	db := mw.GetDbFromContext(ctx)
+	user := &User{ID: userID}
 	if err := db.First(user).Error; err != nil {
 		return nil, err
 	}

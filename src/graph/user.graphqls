@@ -5,7 +5,6 @@ type User {
  id: ID!
  name: String!
  gameState: GameState
- friends: [ID!]
 }
 
 type Query {
@@ -29,7 +28,6 @@ type Friend {
 }
 
 input NewUser {
-#  userId: String!
  name: String!
 }
 

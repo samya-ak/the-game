@@ -7,6 +7,7 @@ import (
 	"thegame/controller"
 	"thegame/graph"
 	"thegame/middleware"
+	"thegame/model"
 	"thegame/pkg/db"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -17,7 +18,12 @@ import (
 
 // Defining the Graphql handler
 func graphqlHandler(database *gorm.DB) gin.HandlerFunc {
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &controller.Resolver{}}))
+	c := graph.Config{
+		Resolvers: &controller.Resolver{
+			UserService: &model.User{},
+		},
+	}
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(c))
 	return middleware.CreateDbContext(database, h)
 }
 
