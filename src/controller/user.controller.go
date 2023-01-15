@@ -19,37 +19,21 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 	uuidValue := uuid.NewString()
 	user := &model.User{ID: uuidValue, Name: input.Name}
 
-	_, err := user.Create(ctx, user)
-	if err != nil {
-		log.Printf("error while creating user: %v", err)
-		return nil, err
-	}
-
-	return user, nil
+	return user.Create(ctx, user)
 }
 
 // UpdateGameState is the resolver for the updateGameState field.
 func (r *mutationResolver) UpdateGameState(ctx context.Context, input model.UserGameState) (*model.GameState, error) {
 	log.Println("Updating user's game state")
 	user := &model.User{ID: input.UserID}
-	rslt, err := user.UpdateGameState(ctx, &input)
-	if err != nil {
-		log.Printf("error while updating user's game state: %v", err)
-		return nil, err
-	}
-	return rslt, nil
+	return user.UpdateGameState(ctx, &input)
 }
 
 // AddFriends is the resolver for the addFriends field.
 func (r *mutationResolver) AddFriends(ctx context.Context, userID string, input []string) ([]*model.Friend, error) {
 	log.Println("Adding friends")
 	user := &model.User{ID: userID}
-	rslt, err := user.AddFriends(ctx, input)
-	if err != nil {
-		log.Printf("error while adding friends: %v", err)
-		return nil, err
-	}
-	return rslt, nil
+	return user.AddFriends(ctx, input, user)
 }
 
 // Users is the resolver for the users field.
@@ -63,24 +47,14 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 func (r *queryResolver) GetGameState(ctx context.Context, userID string) (*model.GameState, error) {
 	log.Println("Getting user's game state")
 	user := &model.User{ID: userID}
-	rslt, err := user.GetGameState(ctx, user)
-	if err != nil {
-		log.Printf("error while geeting user's game state: %v", err)
-		return nil, err
-	}
-	return rslt, nil
+	return user.GetGameState(ctx, user)
 }
 
 // GetFriends is the resolver for the getFriends field.
 func (r *queryResolver) GetFriends(ctx context.Context, userID string) ([]*model.Friend, error) {
 	log.Println("Getting friends")
 	user := &model.User{ID: userID}
-	rslt, err := user.GetFriends(ctx)
-	if err != nil {
-		log.Printf("error while getting friends: %v", err)
-		return nil, err
-	}
-	return rslt, nil
+	return user.GetFriends(ctx, user)
 }
 
 // Mutation returns graph.MutationResolver implementation.

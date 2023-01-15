@@ -73,14 +73,19 @@ func (u *User) GetAll(ctx context.Context) ([]*User, error) {
 }
 
 func (u User) UpdateGameState(ctx context.Context, input *UserGameState) (*GameState, error) {
-	state := &GameState{UserID: input.UserID}
+	state := &GameState{}
 	db := mw.GetDbFromContext(ctx)
 
-	if err := db.First(state).Error; err != nil {
+	if err := db.Where("user_id = ?", input.UserID).First(state).Error; err != nil {
 		return nil, err
 	}
-	state.GamesPlayed = input.GamesPlayed
-	state.Score = input.Score
+	if input.GamesPlayed != nil {
+		state.GamesPlayed = input.GamesPlayed
+	}
+	if input.Score != nil {
+		state.Score = input.Score
+	}
+
 	if err := db.Save(state).Error; err != nil {
 		return nil, err
 	}
@@ -88,42 +93,45 @@ func (u User) UpdateGameState(ctx context.Context, input *UserGameState) (*GameS
 }
 
 func (u *User) GetGameState(ctx context.Context, user *User) (*GameState, error) {
-	state := &GameState{UserID: user.ID}
+	state := &GameState{}
 	db := mw.GetDbFromContext(ctx)
-	if err := db.First(state).Error; err != nil {
+	if err := db.Where("user_id = ?", user.ID).First(state).Error; err != nil {
 		return nil, err
 	}
 	return state, nil
 }
 
-func (u *User) AddFriends(ctx context.Context, friends []string) ([]*Friend, error) {
+func (u *User) AddFriends(ctx context.Context, friends []string, user *User) ([]*Friend, error) {
 	db := mw.GetDbFromContext(ctx)
-	u.FriendsArr = friends
 
-	if err := db.Save(u).Error; err != nil {
+	if err := db.First(user).Error; err != nil {
 		return nil, err
 	}
-	fs, err := u.GetFriends(ctx)
+	user.FriendsArr = friends
+
+	if err := db.Save(user).Error; err != nil {
+		return nil, err
+	}
+	fs, err := u.GetFriends(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 	return fs, nil
 }
 
-func (u *User) GetFriends(ctx context.Context) ([]*Friend, error) {
+func (u *User) GetFriends(ctx context.Context, user *User) ([]*Friend, error) {
 	db := mw.GetDbFromContext(ctx)
-	user := &User{ID: u.ID}
 	if err := db.First(user).Error; err != nil {
 		return nil, err
 	}
-	var users []*User
-	if err := db.Where("id in (?)", user.Friends).Find(&users).Error; err != nil {
+	var users []User
+	if err := db.Where("id in (?)", user.FriendsArr).Preload("GameState").Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return usersToFriends(users), nil
 }
 
-func usersToFriends(users []*User) []*Friend {
+func usersToFriends(users []User) []*Friend {
 	friends := make([]*Friend, 0)
 
 	for _, user := range users {
