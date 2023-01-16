@@ -34,5 +34,14 @@ make stop-start
 make schema
 ```
 
+## Suggestions for improvements
+- Integrate tracing to track request lifecycle
+- Implement authentication and authorization for enhanced security
+- Integrate Metrics for request-response latency, failure rate, status code frequency etc.
+- Export logs to remote dashboard
+- Implement Migration management and versioning
+- Integrate CI/CD to ship app quickly and efficiently
+- Implement test coverage dashboards
+
 ## License
 MIT
