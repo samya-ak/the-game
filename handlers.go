@@ -1,18 +1,15 @@
 package main
 
 import (
-	"log"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
 	"thegame/controller"
 	"thegame/graph"
 	"thegame/middleware"
 	"thegame/model"
-	"thegame/pkg/db"
-
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 // Defining the Graphql handler
@@ -32,18 +29,4 @@ func playgroundHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
-}
-
-func main() {
-	database, err := db.Init()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Setting up Gin
-	r := gin.Default()
-	r.Use(cors.Default())
-	r.POST("/query", graphqlHandler(database))
-	r.GET("/", playgroundHandler())
-	r.Run()
 }
