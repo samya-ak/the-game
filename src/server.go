@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
 	"thegame/controller"
 	"thegame/graph"
 	"thegame/middleware"
@@ -36,7 +34,6 @@ func playgroundHandler() gin.HandlerFunc {
 }
 
 func main() {
-	fmt.Println("llsl ", os.Getenv("USER"))
 	database, err := db.Init()
 	if err != nil {
 		log.Fatal(err)

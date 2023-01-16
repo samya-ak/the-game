@@ -1,15 +1,38 @@
 # the-game
 
-# Get Started
+# Getting Started
+## Prerequisites
+- Docker
+- go1.19
 
+## Major Dependencies
+- [gin](https://github.com/gin-gonic/gin)
+- [gorm](https://github.com/go-gorm/gorm)
+- [gqlgen](https://github.com/99designs/gqlgen)
+- [testify](https://github.com/stretchr/testify)
+- [go-sqlmock](https://github.com/DATA-DOG/go-sqlmock)
+
+## Setup
 Run the app for first time
 ``` shell
-cd src
-make start-local-docker
+git clone git@github.com:samya-ak/the-game.git
+make -C the-game/src start-local-docker
 ```
 
-Run the app again after images have been downloaded
+Available make commands
 ``` shell
-cd src
+# build image and start containers while removing unused containers
+make start-local-docker
+
+# stop containers
+make stop-local-docker
+
+# combination of above two commands, stop before starting again
 make stop-start
+
+# generates models, boilerplate resolvers using gqlgen from graphql schema
+make schema
 ```
+
+## License
+MIT

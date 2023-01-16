@@ -76,7 +76,29 @@ func (s *UserTestSuite) TestUser_Create() {
 	s.NoError(err)
 
 	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
 	s.Equal(expectedUser, user)
+}
+
+func (s *UserTestSuite) TestUser_GetAll() {
+	row1 := sqlmock.NewRows([]string{"id", "name", "friends"}).
+		AddRow("uuid", "John Doe", `["uuid1","uuid2","uuid3"]`)
+	row2 := sqlmock.NewRows([]string{"id", "games_played", "score", "user_id"}).
+		AddRow("uuid0", 12, 15, "uuid")
+
+	query1 := `SELECT * FROM "users"`
+	query2 := `SELECT * FROM "game_states" WHERE "game_states"."user_id" = $1`
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(query1)).
+		WillReturnRows(row1)
+	s.mock.ExpectQuery(regexp.QuoteMeta(query2)).
+		WillReturnRows(row2)
+
+	users, err := (&User{}).GetAll(context.Background())
+	s.NoError(err)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+	s.GreaterOrEqual(len(users), 1)
 }
 
 func TestUserTestSuite(t *testing.T) {
