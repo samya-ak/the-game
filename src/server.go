@@ -10,6 +10,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -41,6 +42,7 @@ func main() {
 
 	// Setting up Gin
 	r := gin.Default()
+	r.Use(cors.Default())
 	r.POST("/query", graphqlHandler(database))
 	r.GET("/", playgroundHandler())
 	r.Run()
