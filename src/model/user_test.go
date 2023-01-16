@@ -101,6 +101,32 @@ func (s *UserTestSuite) TestUser_GetAll() {
 	s.GreaterOrEqual(len(users), 1)
 }
 
+func (s *UserTestSuite) TestUser_UpdateGameState() {
+	input := &UserGameState{
+		UserID:      "uuid",
+		GamesPlayed: GetIntPointer(12),
+		Score:       GetIntPointer(25),
+	}
+	query1 := `SELECT * FROM "game_states" WHERE user_id = $1 ORDER BY "game_states"."id" LIMIT 1`
+	query2 := `UPDATE "game_states" SET "games_played"=$1,"score"=$2,"user_id"=$3 WHERE "id" = $4`
+	row1 := sqlmock.NewRows([]string{"id", "games_played", "score", "user_id"}).
+		AddRow("uuid0", 12, 15, "uuid")
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(query1)).
+		WillReturnRows(row1)
+	s.mock.ExpectBegin()
+	s.mock.ExpectExec(regexp.QuoteMeta(query2)).
+		WithArgs(12, 25, "uuid", "uuid0").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	s.mock.ExpectCommit()
+
+	state, err := (&User{}).UpdateGameState(context.Background(), input)
+	s.NoError(err)
+	err = s.mock.ExpectationsWereMet()
+	s.NoError(err)
+	s.NotEqual(state, nil)
+}
+
 func TestUserTestSuite(t *testing.T) {
 	suite.Run(t, new(UserTestSuite))
 }
