@@ -16,7 +16,7 @@
 Run the app for first time
 ``` shell
 git clone git@github.com:samya-ak/the-game.git
-make -C the-game/src start-local-docker
+make -C the-game start-local-docker
 ```
 
 Available make commands
