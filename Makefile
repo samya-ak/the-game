@@ -1,6 +1,5 @@
 
 APP_ROOT ?= $(shell 'pwd')
-# Base image for pacakge deployment
 IMAGE_NAME ?= robusdockerhub/pkg-base-image
 # Alias command for docker's `make` executable
 DOCKER_RUN ?=  \
@@ -31,14 +30,20 @@ docker/pre-commit-install:
 
 ## Uninstall pre-commit
 docker/pre-commit-uninstall:
-	@$(DOCKER_RUN) pre-commit uninstall
+	@$(DOCKER_RUN) pre-commit-uninstall
 
 ## Run golangci-lint
 docker/golangci-lint:
-	@$(DOCKER_RUN) golangci-lint run
+	@$(DOCKER_RUN) golangci-lint-run
 
 pre-commit-install:
 	pre-commit install
 
+pre-commit-uninstall:
+	pre-commit uninstall
+
 pre-commit-run:
 	pre-commit run
+
+golangci-lint-run:
+	golangci-lint run

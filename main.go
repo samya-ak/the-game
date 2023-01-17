@@ -27,6 +27,6 @@ func main() {
 	}
 	// Run the application.
 	if err := a.Run(); err != nil {
-		log.Fatalf("something went wrong while running the app %v", err)
+		log.Fatalf("something went wrong while running the app: %v", err)
 	}
 }
