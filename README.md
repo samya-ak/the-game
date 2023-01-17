@@ -83,7 +83,7 @@ make docker/pre-commit
 make docker/pre-commit-uninstall
 
 # run golangci-lint
-docker/golangci-lint:
+make docker/golangci-lint:
 
 # generates models, boilerplate resolvers using gqlgen from graphql schema
 make schema
